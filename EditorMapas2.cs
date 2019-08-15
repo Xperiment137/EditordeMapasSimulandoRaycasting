@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using UnityEditor;
+using System.Linq;
 public class EditorMapas2 : MonoBehaviour
 {
     private Quaternion newQuaternion;
     public Terrain aux;
     public Mesh x2;
     private Vector3[] vertices;
-    public GameObject pared;
+
     private int con = 0;
     public float x = 0;
     public float z = 0;
@@ -18,15 +19,16 @@ public class EditorMapas2 : MonoBehaviour
     public int tope2 = 0;
     public int tope3 = 0;
     public int i = 0;
+
+
     void Awake()
     {
-         newQuaternion = new Quaternion();
+        newQuaternion = new Quaternion();
         x2 = new Mesh();
         aux = GetComponent<Terrain>();
         GetComponent<MeshFilter>().mesh = x2; // lo añades pero autogenera la "figura".
         vertices = x2.vertices;
         x2.RecalculateBounds();//calcular el volumen delimitador de la malla a partir de los vértices.
-        pared = (GameObject)PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath("Assets/3Dmap/Pared.prefab", typeof(GameObject)));
         StartCoroutine(CalulateShape());
     }
     void Start()
@@ -34,6 +36,7 @@ public class EditorMapas2 : MonoBehaviour
 
         Dibujar();
         Pintar();
+        
 
     }
 
@@ -51,12 +54,12 @@ public class EditorMapas2 : MonoBehaviour
     }
     IEnumerator CalulateShape()
     {
-        vertices = new Vector3[(int)aux.terrainData.size.x*(int)aux.terrainData.size.x]; // el +2 es porque la clase vector3 pcuneta como 3 posiciones en el array [1]={0,1,2},{3,4,5};
+        vertices = new Vector3[(int)aux.terrainData.size.x * (int)aux.terrainData.size.x]; // el +2 es porque la clase vector3 pcuneta como 3 posiciones en el array [1]={0,1,2},{3,4,5};
         for (x = 0; x < aux.terrainData.size.x; x++)
         {
             if (x % 10 == 0)
             {
-                vertices[i++] = new Vector3(x, 1.7f, 0.6f);
+                vertices[i++] = new Vector3(x, 5f, 1.6f);
                 con++;
             }
         }
@@ -65,7 +68,7 @@ public class EditorMapas2 : MonoBehaviour
         {
             if (z % 10 == 0)
             {
-                vertices[i++] = new Vector3(0.6f, 1.7f, z);
+                vertices[i++] = new Vector3(1.6f, 5f, z);
                 con++;
             }
         }
@@ -74,7 +77,7 @@ public class EditorMapas2 : MonoBehaviour
         {
             if (x % 10 == 0)
             {
-                vertices[i++] = new Vector3(x, 1.7f, aux.terrainData.size.z);
+                vertices[i++] = new Vector3(x, 5f, aux.terrainData.size.z);
                 con++;
             }
         }
@@ -83,7 +86,7 @@ public class EditorMapas2 : MonoBehaviour
         {
             if (z % 10 == 0)
             {
-                vertices[i++] = new Vector3(aux.terrainData.size.x, 1.7f, z);
+                vertices[i++] = new Vector3(aux.terrainData.size.x, 5f, z);
                 con++;
             }
         }
@@ -109,6 +112,7 @@ public class EditorMapas2 : MonoBehaviour
     private void Dibujar()
     {
 
+
         // cammbia el tiling de la textura o dara fallos de parpadeo
         var angles = transform.rotation.eulerAngles;
         angles.y = 90;
@@ -119,23 +123,24 @@ public class EditorMapas2 : MonoBehaviour
 
             if (i <= tope)
             {
-                Instantiate(pared, vertices[i], Quaternion.identity);
+
+                Instantiate(AssetDatabase.LoadAssetAtPath("Assets/3Dmap/Pared.prefab", typeof(GameObject)), vertices[i], Quaternion.identity);
             }
 
-            if (i <= tope1&& i > tope)
-            {
-               
-               Instantiate(pared, vertices[i],newQuaternion);
-
-            }
-            if (i <= tope2&& i > tope1 && i > tope)
-            {
-                Instantiate(pared, vertices[i], Quaternion.identity);
-            }
-            if (i <= tope3&& i > tope2 && i > tope1 && i > tope)
+            if (i <= tope1 && i > tope)
             {
 
-                Instantiate(pared, vertices[i], newQuaternion);
+                Instantiate(AssetDatabase.LoadAssetAtPath("Assets/3Dmap/Pared.prefab", typeof(GameObject)), vertices[i], newQuaternion);
+
+            }
+            if (i <= tope2 && i > tope1 && i > tope)
+            {
+                Instantiate(AssetDatabase.LoadAssetAtPath("Assets/3Dmap/Pared.prefab", typeof(GameObject)), vertices[i], Quaternion.identity);
+            }
+            if (i <= tope3 && i > tope2 && i > tope1 && i > tope)
+            {
+
+                Instantiate(AssetDatabase.LoadAssetAtPath("Assets/3Dmap/Pared.prefab", typeof(GameObject)), vertices[i], newQuaternion);
             }
         }
 
@@ -152,7 +157,7 @@ public class EditorMapas2 : MonoBehaviour
                 float normX = x * 1.0f / (aux.terrainData.alphamapWidth - 1);
                 float normY = y * 1.0f / (aux.terrainData.alphamapHeight - 1);
 
-                
+
                 var angle = aux.terrainData.GetSteepness(normX, normY);
 
                 var frac = angle / 90.0;
@@ -160,8 +165,44 @@ public class EditorMapas2 : MonoBehaviour
                 MapaTexturas[x, y, 1] = (float)(1 - frac);
             }
         }
-       aux.terrainData.SetAlphamaps(0, 0, MapaTexturas);
+        aux.terrainData.SetAlphamaps(0, 0, MapaTexturas);
+    }
+    private void CrearMazmorra()
+    {
+        int x = 0;
+        int y = 0;
+        int[] arr = { 0, 1, 2 };
+        Instantiate(AssetDatabase.LoadAssetAtPath("Assets/3Dmap/Pasillo Variant Variant.prefab", typeof(GameObject)), new Vector3(7f, 5f, 20f), Quaternion.identity);
+       switch(GeneracionAleatoriaSala(x,y))
+        {
+            case 0:
+
+                break;
+            case 1:
+               
+                break;
+            case 2:
+
+                break;
+        }
+
+       
+    }
+    private int GeneracionAleatoriaSala(int x,int y)
+    {
+        System.Random r = new System.Random();
+        return r.Next(x, y);
+    }
+    private int GeneracionAleatoriaDireccion(int x, int y)
+    {
+        System.Random r = new System.Random();
+        return r.Next(x, y);
     }
 }
-    
 
+
+//Instantiate(AssetDatabase.LoadAssetAtPath("Assets/3Dmap/Pasillo Variant Variant.prefab", typeof(GameObject)), vertices[i], Quaternion.identity);
+        //Instantiate(AssetDatabase.LoadAssetAtPath("Assets/3Dmap/Habitacion1 Variant.prefab", typeof(GameObject)), vertices[i], Quaternion.identity);
+       // Instantiate(AssetDatabase.LoadAssetAtPath("Assets/3Dmap/Habitacion2 Variant.prefab", typeof(GameObject)), vertices[i], Quaternion.identity);
+       // while (x<aux.terrainData.size.x && z<aux.terrainData.size.z)
+       
