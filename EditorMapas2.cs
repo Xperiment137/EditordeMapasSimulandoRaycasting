@@ -173,7 +173,7 @@ public class EditorMapas2 : MonoBehaviour
         int y = 0;
         int[] arr = { 0, 1, 2 };
         Instantiate(AssetDatabase.LoadAssetAtPath("Assets/3Dmap/Pasillo Variant Variant.prefab", typeof(GameObject)), new Vector3(7f, 5f, 20f), Quaternion.identity);
-       switch(GeneracionAleatoriaSala(x,y))
+       switch(GeneracionAleatoria(x,y))
         {
             case 0:
 
@@ -188,16 +188,12 @@ public class EditorMapas2 : MonoBehaviour
 
        
     }
-    private int GeneracionAleatoriaSala(int x,int y)
+    private int GeneracionAleatoria(int x,int y)
     {
         System.Random r = new System.Random();
         return r.Next(x, y);
     }
-    private int GeneracionAleatoriaDireccion(int x, int y)
-    {
-        System.Random r = new System.Random();
-        return r.Next(x, y);
-    }
+ 
 }
 
 
